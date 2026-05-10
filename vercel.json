@@ -1,0 +1,18 @@
+{
+  "functions": {
+    "api/wsb/hot.py":          { "runtime": "python3.12" },
+    "api/wsb/ticker.py":       { "runtime": "python3.12" },
+    "api/wsb/signals.py":      { "runtime": "python3.12" },
+    "api/wsb/technicals.py":   { "runtime": "python3.12" }
+  },
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin",  "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET, OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type" }
+      ]
+    }
+  ]
+}

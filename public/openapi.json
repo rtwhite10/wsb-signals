@@ -1,0 +1,110 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "WSB Trading Signals",
+    "version": "1.0.0",
+    "description": "Live trading signals scraped from Reddit r/wallstreetbets"
+  },
+  "servers": [
+    { "url": "https://YOUR_VERCEL_URL" }
+  ],
+  "paths": {
+    "/api/wsb/hot": {
+      "get": {
+        "operationId": "getHotPosts",
+        "summary": "Get hot WSB posts with tickers and sentiment",
+        "description": "Returns the top 25 hot posts from r/wallstreetbets. Each post includes extracted stock tickers and a sentiment label (bullish/bearish/neutral).",
+        "responses": {
+          "200": {
+            "description": "Array of posts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Post" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/wsb/ticker": {
+      "get": {
+        "operationId": "getTickerPosts",
+        "summary": "Get WSB posts mentioning a specific ticker",
+        "description": "Scrapes the top 50 hot posts and filters for those mentioning the given stock symbol. Returns the same post shape as /api/wsb/hot.",
+        "parameters": [
+          {
+            "name": "symbol",
+            "in": "query",
+            "required": true,
+            "description": "Stock ticker symbol, e.g. NVDA, AAPL, GME",
+            "schema": { "type": "string", "example": "NVDA" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Filtered posts mentioning the ticker",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Post" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/wsb/signals": {
+      "get": {
+        "operationId": "getSignals",
+        "summary": "Get aggregated trading signals ranked by mention count",
+        "description": "Aggregates ticker mentions across the top 50 WSB posts and returns a ranked leaderboard. Each entry has mention count and an overall sentiment score derived from keyword analysis.",
+        "responses": {
+          "200": {
+            "description": "Ranked list of tickers",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Signal" }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Post": {
+        "type": "object",
+        "properties": {
+          "title":           { "type": "string" },
+          "url":             { "type": "string", "format": "uri" },
+          "score":           { "type": "integer" },
+          "num_comments":    { "type": "integer" },
+          "tickers":         { "type": "array", "items": { "type": "string" } },
+          "sentiment":       { "type": "string", "enum": ["bullish", "bearish", "neutral"] },
+          "sentiment_score": { "type": "number", "minimum": -1, "maximum": 1 },
+          "bullish_count":   { "type": "integer" },
+          "bearish_count":   { "type": "integer" }
+        }
+      },
+      "Signal": {
+        "type": "object",
+        "properties": {
+          "ticker":          { "type": "string" },
+          "mentions":        { "type": "integer" },
+          "sentiment_score": { "type": "number", "minimum": -1, "maximum": 1 },
+          "bullish_count":   { "type": "integer" },
+          "bearish_count":   { "type": "integer" }
+        }
+      }
+    }
+  }
+}

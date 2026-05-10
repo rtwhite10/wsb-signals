@@ -1,0 +1,14 @@
+{
+  "schema_version": "v1",
+  "name_for_human": "WSB Trading Signals",
+  "name_for_model": "wsb_trading_signals",
+  "description_for_human": "Get live stock trading signals scraped from Reddit WallStreetBets.",
+  "description_for_model": "Use this to fetch trending stock tickers and sentiment from r/wallstreetbets. Call get_signals for a ranked leaderboard of mentioned tickers, get_hot_posts for raw post data, or get_ticker_posts to filter posts about a specific stock. Useful for answering questions like 'what is WSB talking about today?' or 'what are people saying about NVDA?'",
+  "api": {
+    "type": "openapi",
+    "url": "https://YOUR_VERCEL_URL/openapi.json"
+  },
+  "auth": {
+    "type": "none"
+  }
+}
