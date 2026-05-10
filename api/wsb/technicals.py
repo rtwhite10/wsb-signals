@@ -23,19 +23,8 @@ def _macd(series, fast=12, slow=26, sig=9):
 
 def _get_technicals(symbol: str) -> dict:
     import time
-    import requests as _req
 
-    session = _req.Session()
-    session.headers.update({
-        "User-Agent": (
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/124.0.0.0 Safari/537.36"
-        ),
-        "Accept": "application/json",
-    })
-
-    ticker = yf.Ticker(symbol, session=session)
+    ticker = yf.Ticker(symbol)
     hist   = None
     for attempt in range(3):
         try:
