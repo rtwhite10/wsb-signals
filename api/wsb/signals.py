@@ -72,8 +72,27 @@ _HEADERS = {
 
 
 def _fetch(limit: int = 50) -> list:
-    url = f"https://www.reddit.com/r/wallstreetbets/hot.json?limit={limit}"
-    resp = _requests.get(url, headers=_HEADERS, timeout=15)
+    import os
+    client_id     = os.environ.get("REDDIT_CLIENT_ID", "")
+    client_secret = os.environ.get("REDDIT_CLIENT_SECRET", "")
+
+    if client_id and client_secret:
+        tok = _requests.post(
+            "https://www.reddit.com/api/v1/access_token",
+            auth=(client_id, client_secret),
+            data={"grant_type": "client_credentials"},
+            headers={"User-Agent": "WSBSignals/1.0"},
+            timeout=10,
+        )
+        tok.raise_for_status()
+        token = tok.json()["access_token"]
+        url     = f"https://oauth.reddit.com/r/wallstreetbets/hot?limit={limit}"
+        headers = {"Authorization": f"bearer {token}", "User-Agent": "WSBSignals/1.0"}
+    else:
+        url     = f"https://www.reddit.com/r/wallstreetbets/hot.json?limit={limit}"
+        headers = _HEADERS
+
+    resp = _requests.get(url, headers=headers, timeout=15)
     resp.raise_for_status()
     raw = resp.json()
     posts = []

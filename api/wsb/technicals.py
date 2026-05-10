@@ -22,11 +22,32 @@ def _macd(series, fast=12, slow=26, sig=9):
 
 
 def _get_technicals(symbol: str) -> dict:
-    ticker = yf.Ticker(symbol)
-    hist   = ticker.history(period="1y")
+    import time
+    import requests as _req
 
-    if hist.empty:
-        raise ValueError(f"No price data found for '{symbol}'")
+    session = _req.Session()
+    session.headers.update({
+        "User-Agent": (
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/124.0.0.0 Safari/537.36"
+        ),
+        "Accept": "application/json",
+    })
+
+    ticker = yf.Ticker(symbol, session=session)
+    hist   = None
+    for attempt in range(3):
+        try:
+            hist = ticker.history(period="1y")
+            if not hist.empty:
+                break
+        except Exception:
+            pass
+        time.sleep(1.5)
+
+    if hist is None or hist.empty:
+        raise ValueError(f"No price data found for '{symbol}' — Yahoo Finance may be rate-limiting. Try again in a moment.")
 
     close  = hist["Close"]
     volume = hist["Volume"]
